@@ -1,0 +1,1 @@
+simple example on one way to structure code to be more testable without using fakes and interfaces
