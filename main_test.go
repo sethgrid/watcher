@@ -31,6 +31,7 @@ func TestContentUpdatedTracked(t *testing.T) {
 
 		select {
 		case <-w.done:
+			t.Error("done channel closed, expected event instead")
 			return
 		case event := <-w.Event:
 			fmt.Printf("fmt Event: %s\n", event)

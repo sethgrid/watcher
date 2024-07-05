@@ -8,6 +8,7 @@ import (
 
 func main() {
 	meta, err := GrabMeta("/path/set/by/env/variable/or/flag")
+	// meta, err := GrabMeta("README.md")
 	if err != nil {
 		fmt.Printf("Error getting file info: %s", err)
 		os.Exit(1)
@@ -18,6 +19,12 @@ func main() {
 		fmt.Printf("Error creating watcher: %s", err)
 		os.Exit(1)
 	}
+
+	go func() {
+		for event := range w.Event {
+			fmt.Printf("Event: %s\n", event)
+		}
+	}()
 
 	// Block until killed
 	<-w.Closed
@@ -44,8 +51,8 @@ func NewWatcher(meta Meta, pollTime time.Duration) (*Watcher, error) {
 					w.Event <- fmt.Sprintf("Error getting file info: %s", err)
 					continue
 				}
-
 				w.metaCh <- newMeta
+				// fmt.Println("Polled")
 			}
 		}
 	}()
@@ -75,12 +82,10 @@ func NewWatcher(meta Meta, pollTime time.Duration) (*Watcher, error) {
 }
 
 func GenEvent(oldMeta, newMeta Meta) (string, error) {
-	// Compare content
 	if string(oldMeta.Content) != string(newMeta.Content) {
 		return "Content changed", nil
 	}
 
-	// Compare permissions
 	if oldMeta.Permissions != newMeta.Permissions {
 		return "Permissions changed", nil
 	}
