@@ -10,13 +10,13 @@ func main() {
 	meta, err := GrabMeta("/path/set/by/env/variable/or/flag")
 	// meta, err := GrabMeta("README.md")
 	if err != nil {
-		fmt.Printf("Error getting file info: %s", err)
+		fmt.Printf("error getting file info: %s", err)
 		os.Exit(1)
 	}
 
 	w, err := NewWatcher(meta, 5*time.Second)
 	if err != nil {
-		fmt.Printf("Error creating watcher: %s", err)
+		fmt.Printf("error creating watcher: %s", err)
 		os.Exit(1)
 	}
 
@@ -48,7 +48,7 @@ func NewWatcher(meta Meta, pollTime time.Duration) (*Watcher, error) {
 			case <-ticker.C:
 				newMeta, err := GrabMeta(meta.FilePath)
 				if err != nil {
-					w.Event <- fmt.Sprintf("Error getting file info: %s", err)
+					w.Event <- fmt.Sprintf("error getting file info: %s", err)
 					continue
 				}
 				w.metaCh <- newMeta
@@ -66,7 +66,7 @@ func NewWatcher(meta Meta, pollTime time.Duration) (*Watcher, error) {
 			case newMeta := <-w.metaCh:
 				event, err := GenEvent(meta, newMeta)
 				if err != nil {
-					w.Event <- fmt.Sprintf("Error generating event: %s", err)
+					w.Event <- fmt.Sprintf("error generating event: %s", err)
 				}
 				w.Event <- event
 				meta = newMeta
@@ -106,12 +106,12 @@ type Meta struct {
 func GrabMeta(filepath string) (Meta, error) {
 	file, err := os.Stat(filepath)
 	if err != nil {
-		return Meta{}, fmt.Errorf("Error getting file info: %w", err)
+		return Meta{}, fmt.Errorf("error getting file info: %w", err)
 	}
 
 	content, err := os.ReadFile(filepath)
 	if err != nil {
-		return Meta{}, fmt.Errorf("Error reading file: %w", err)
+		return Meta{}, fmt.Errorf("error reading file: %w", err)
 	}
 
 	return Meta{
