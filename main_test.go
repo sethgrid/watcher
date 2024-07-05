@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -34,17 +33,16 @@ func TestContentUpdatedTracked(t *testing.T) {
 			t.Error("done channel closed, expected event instead")
 			return
 		case event := <-w.Event:
-			fmt.Printf("fmt Event: %s\n", event)
-			t.Errorf("t Event: %s", event)
+			if event != "Content changed" {
+				t.Errorf("Expected 'Content updated', got %s", event)
+			}
 		}
-
 	}()
 
 	go func() {
-		newMeta := meta
 		meta.Content = []byte("Goodbye, world")
-		newMeta.LatestUpdate = time.Now().Add(1 * time.Minute)
-		w.metaCh <- newMeta
+		meta.LatestUpdate = time.Now().Add(1 * time.Minute)
+		w.metaCh <- meta
 	}()
 
 	wg.Wait()

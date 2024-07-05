@@ -64,16 +64,12 @@ func NewWatcher(meta Meta, pollTime time.Duration) (*Watcher, error) {
 				close(w.Closed)
 				return
 			case newMeta := <-w.metaCh:
-				if newMeta.LatestUpdate.After(meta.LatestUpdate) {
-					w.Event <- "File changed"
-
-					event, err := GenEvent(meta, newMeta)
-					if err != nil {
-						w.Event <- fmt.Sprintf("Error generating event: %s", err)
-					}
-					w.Event <- event
-					meta = newMeta
+				event, err := GenEvent(meta, newMeta)
+				if err != nil {
+					w.Event <- fmt.Sprintf("Error generating event: %s", err)
 				}
+				w.Event <- event
+				meta = newMeta
 			}
 		}
 	}()
